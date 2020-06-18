@@ -41,7 +41,7 @@ Use requirements.txt file to install required packages, or install packages and 
 * scikit_learn==0.23.1
 * xgboost==1.1.1
 
-Data can be found on [Kaggle] (https://www.kaggle.com/blastchar/telco-customer-churn)
+Data can be found on [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
 
 ## Features
 The following three Machine Learning models are included:
@@ -60,4 +60,4 @@ Project is: _in progress_
 Created by [Gabrielle Nyirjesy](https://www.linkedin.com/in/gabrielle-gabby-nyirjesy-524728a9/) - feel free to contact me!
 
 ## Acknowledgements
-* Data pulled from [Kaggle] (https://www.kaggle.com/blastchar/telco-customer-churn)
+* Data pulled from [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
