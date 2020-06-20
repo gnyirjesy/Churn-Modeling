@@ -51,13 +51,41 @@ The following three Machine Learning models are included:
 * Random Forest
 
 To-do list:
-* Add results to README
+
+* Grid search for Catboost
 
 ## Status
 Project is: _in progress_
 
+## Results
+### Random Forest Results:
+| Metric | Train | Test |
+| ------ | ----- | ----- |
+| AUC | 0.746 | 0.896 |
+| Accuracy | 0.766 | 0.873 |
+| F1 | 0.614 | 0.797 |
+| Recall | 0.703 | 0.945 |
+| Precision | 0.546 | 0.690 |
+### XGBoost Results:
+| Metric | Train | Test |
+| ------ | ----- | ----- |
+| AUC | 0.759 |  0.789 |
+| Accuracy | 0.746 | 0.769 |
+| F1 | .622 | 0.656 |
+| Recall | 0.786 |  0.831 |
+| Precision | 0.514 | 0.542 |
+
+### CatBoost Results:
+| Metric | Train | Test |
+| ------ | ----- | ----- |
+| AUC | 0.753 |  0.784 |
+| Accuracy | 0.736 | 0.762 |
+| F1 | 0.613 |  0.650 |
+| Recall | 0.789 | 0.830 |
+| Precision | 0.501 |  0.534 |
+
 ## Contact
-Created by [Gabrielle Nyirjesy](https://www.linkedin.com/in/gabrielle-gabby-nyirjesy-524728a9/) - feel free to contact me!
+Created by [Gabrielle Nyirjesy](https://www.linkedin.com/in/gabrielle-gabby-nyirjesy) - feel free to contact me!
 
 ## Acknowledgements
 * Data pulled from [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
