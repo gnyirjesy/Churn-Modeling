@@ -51,10 +51,6 @@ The following three Machine Learning models are included:
 * XGBoost
 * Random Forest
 
-To-do list:
-
-* Grid search for Catboost
-
 ## Results
 Overall the CatBoost model outperformed the Random Forest and XGBoost models in recall. Recall is the chosen metric because the cost of false positives is low in this case and we want to capture all positives. The full metrics for each model is included below: 
 ### Random Forest Results:
