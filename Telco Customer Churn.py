@@ -117,6 +117,9 @@ class parameter_tuning():
         elif model == 'xgboost':
             estimator = XGBClassifier(loss_function='Logloss', random_seed=seed)
             
+        elif model == 'catboost':
+            estimator = CatBoostClassifier(loss_function='Logloss', random_seed=seed)
+       
         strat_kfold = StratifiedKFold(n_splits = 4, shuffle = True, random_state = seed)
         scoring = make_scorer(recall_score)
         random_search = RandomizedSearchCV(estimator=estimator, param_distributions=random_grid,
@@ -136,7 +139,10 @@ class parameter_tuning():
 
         elif model == 'xgboost':
             estimator = XGBClassifier()
-
+            
+        elif model == 'catboost':
+            estimator = CatBoostClassifier()
+       
         strat_kfold = StratifiedKFold(n_splits = 4, shuffle = True, random_state = seed)
         scoring = make_scorer(recall_score)
         grid_search = GridSearchCV(estimator=estimator, param_grid=random_grid, cv=strat_kfold.split(x, y),
@@ -160,12 +166,8 @@ class models():
         '''
         combined = pd.concat([x_train, x_test])
         cat_feat_index = np.where(combined.dtypes == object)[0]
-        if use_best_mod:
-            model = CatBoostClassifier(scale_pos_weight = kwargs['scale_pos_weight'], use_best_model=True,
+        model = CatBoostClassifier(**kwargs, use_best_model=True,
                                        loss_function='Logloss', eval_metric='Recall', random_seed=seed)
-        else:
-            model = CatBoostClassifier(**kwargs, loss_function='Logloss', eval_metric='Recall',
-                                       random_seed=seed, use_best_model=False)
             
         model.fit(x_train, y_train, plot=True, cat_features=cat_feat_index, eval_set=(x_test, y_test))
         
@@ -412,7 +414,7 @@ y = df_new[binary_var]
 
 # ## Random Forest Model
 
-# In[26]:
+# In[25]:
 
 
 #Label encode the categorical columns within the x data since categorical variables are not accepted in
@@ -420,14 +422,14 @@ y = df_new[binary_var]
 x_cat = clean.label_encoding(x)
 
 
-# In[27]:
+# In[26]:
 
 
 #Ensure all columns are numeric
 x_cat.info()
 
 
-# In[28]:
+# In[27]:
 
 
 #Split the encoded data into train and test sets
@@ -435,7 +437,7 @@ x_cat_train, x_cat_test, y_cat_train, y_cat_test = train_test_split(x_cat, y, st
                                                                     test_size=0.2, random_state=seed)
 
 
-# In[29]:
+# In[28]:
 
 
 #Define random_grid for parameter tuning random search
@@ -448,7 +450,7 @@ random_grid = {'n_estimators': [int(x) for x in np.linspace(start=200, stop=2000
                           'class_weight': ['balanced']}
 
 
-# In[30]:
+# In[29]:
 
 
 #Run a random search of Random Forest parameters to find best initial hyper parameters. Use stratified k-fold
@@ -456,13 +458,13 @@ random_grid = {'n_estimators': [int(x) for x in np.linspace(start=200, stop=2000
 params = parameter_tuning.randomsearch(seed, x_cat, y, random_grid, 'rf')
 
 
-# In[31]:
+# In[30]:
 
 
 print(params)
 
 
-# In[32]:
+# In[31]:
 
 
 #Define random grid for grid search parameter tuning
@@ -475,7 +477,7 @@ random_grid = {'n_estimators': [600, 700],
                           'class_weight': ['balanced']}
 
 
-# In[34]:
+# In[32]:
 
 
 #Run a more intensive grid search to tune hyper parameters for Random Forest Model.  Use stratified k-fold
@@ -483,20 +485,20 @@ random_grid = {'n_estimators': [600, 700],
 params = parameter_tuning.gridsearch(seed, x_cat, y, random_grid, 'rf')
 
 
-# In[35]:
+# In[33]:
 
 
 print(params)
 
 
-# In[36]:
+# In[34]:
 
 
 #Run the preliminary Random Forest Model
 rf_mod = models.rf_model(x_cat_train, y_cat_train, seed, **params)
 
 
-# In[37]:
+# In[35]:
 
 
 #Explore feature importance
@@ -507,7 +509,7 @@ rf_mod_imp = rf_mod_imp[rf_mod_imp['Gini-importance'] >= 0.01]
 print(rf_mod_imp)
 
 
-# In[38]:
+# In[36]:
 
 
 #Keep top importance features in the x data
@@ -516,25 +518,28 @@ x_train_rf_imp = x_cat_train[rf_mod_imp['col']]
 x_test_rf_imp = x_cat_test[rf_mod_imp['col']]
 
 
-# In[39]:
+# In[37]:
 
 
+#Run Random Forest model with only important features
 rf_mod = models.rf_model(x_train_rf_imp, y_cat_train, seed, **params)
 
 
-# In[40]:
+# In[38]:
 
 
+#Use Random Forest model to make predictions on train and test sets
 y_pred_train_rf, y_pred_test_rf = evaluation.predictions(rf_mod, x_train_rf_imp, x_test_rf_imp)
 
 
-# In[41]:
+# In[39]:
 
 
+#Examine model performance metrics
 rf_results = evaluation.results(y_cat_train, y_cat_test, y_pred_train_rf, y_pred_test_rf)
 
 
-# In[42]:
+# In[40]:
 
 
 print(rf_results)
@@ -544,14 +549,14 @@ print(rf_results)
 
 # ## XGBoost Model
 
-# In[46]:
+# In[41]:
 
 
 #Define scale_pos weight term to compensate for class imbalance in XGBoost model
 scale_pos = y_cat_train.value_counts()[0]/y_cat_train.value_counts()[1]
 
 
-# In[47]:
+# In[42]:
 
 
 #Create random grid for random search parameter tuning
@@ -563,20 +568,20 @@ random_grid = {'min_child_weight': [1, 5, 10],
                           'scale_pos_weight': [scale_pos]}
 
 
-# In[48]:
+# In[43]:
 
 
 #Run a random search of XGboost parameters to find best initial hyper parameters
 params = parameter_tuning.randomsearch(seed, x_cat, y, random_grid, 'xgboost')
 
 
-# In[49]:
+# In[44]:
 
 
 print(params)
 
 
-# In[50]:
+# In[45]:
 
 
 #Define random grid for grid search parameter tuning
@@ -588,34 +593,34 @@ random_grid = {'min_child_weight': [1, 2],
                           'scale_pos_weight': [scale_pos]}
 
 
-# In[51]:
+# In[46]:
 
 
-#Run a more intensive grid search to tune hyper parameters for Random Forest Model.  Use stratified k-fold
+#Run a more intensive grid search to tune hyper parameters for XGBoost Model.  Use stratified k-fold
 #cross-validation in randomsearch
 params = parameter_tuning.gridsearch(seed, x_cat, y, random_grid, 'xgboost')
 
 
-# In[52]:
+# In[47]:
 
 
 print(params)
 
 
-# In[53]:
+# In[48]:
 
 
 #Run the preliminary XGboost Model
 xgb_mod = models.xgboost_model(x_cat_train, y_cat_train, seed, **params)
 
 
-# In[54]:
+# In[49]:
 
 
 print(params)
 
 
-# In[55]:
+# In[50]:
 
 
 #Explore feature importance
@@ -626,7 +631,7 @@ xgb_mod_imp = xgb_mod_imp[xgb_mod_imp['Gini-importance'] >= 0.01]
 print(xgb_mod_imp)
 
 
-# In[56]:
+# In[51]:
 
 
 #Keep top importance features in the x data
@@ -635,29 +640,31 @@ x_train_xgb_imp = x_cat_train[xgb_mod_imp['col']]
 x_test_xgb_imp = x_cat_test[xgb_mod_imp['col']]
 
 
-# In[57]:
+# In[52]:
 
 
 #Run XGboost Model
 xgb_mod = models.xgboost_model(x_train_xgb_imp, y_cat_train, seed, **params)
 
 
-# In[58]:
+# In[53]:
 
 
+#Make predictions on train and test sets
 y_pred_train_xgb, y_pred_test_xgb = evaluation.predictions(xgb_mod, x_train_xgb_imp, x_test_xgb_imp)
 
 
-# In[59]:
+# In[54]:
 
 
+#Examine model metric esults
 xgb_results = evaluation.results(y_cat_train, y_cat_test, y_pred_train_xgb, y_pred_test_xgb)
 print(xgb_results)
 
 
 # ## CatBoost Model
 
-# In[60]:
+# In[55]:
 
 
 #Split data into test, train, and validation sets
@@ -665,58 +672,78 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, test_size=
 x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, stratify=y_train, test_size=0.15, random_state=seed)
 
 
-# In[61]:
+# In[56]:
 
 
 #Define scale_pos weight term to compensate for class imbalance in CatBoost model
 scale_pos = y_train.value_counts()[0]/y_train.value_counts()[1]
 
 
+# In[57]:
+
+
+#Create random grid for random search parameter tuning
+random_grid = {'learning_rate': [0.03, 0.1],
+                          'l2_leaf_reg': [1, 3, 5, 7, 9],
+                          'depth': [4, 6, 10],
+                          'scale_pos_weight': [scale_pos]}
+
+
+# In[58]:
+
+
+#Run a random search of XGboost parameters to find best initial hyper parameters
+params = parameter_tuning.randomsearch(seed, x_cat, y, random_grid, 'catboost')
+
+
+# In[59]:
+
+
+print(params)
+
+
+# In[60]:
+
+
+#Create random grid for grid search parameter tuning
+random_grid = {'learning_rate': [0.03, 0.05],
+                          'l2_leaf_reg': [8, 9, 10],
+                          'depth': [4, 5, 6],
+                          'scale_pos_weight': [scale_pos]}
+
+
+# In[61]:
+
+
+#Run a more intensive grid search to tune hyper parameters for CatBoost Model.  Use stratified k-fold
+#cross-validation in randomsearch
+params = parameter_tuning.gridsearch(seed, x_cat, y, random_grid, 'catboost')
+
+
 # In[62]:
 
 
-#Define parameters to use in catboost model when use_best_mod == False
-params={
-    'depth': 4,
-    'iterations': 1000,
-    'learning_rate': 0.01,
-    'scale_pos_weight': scale_pos
-}
+print(params)
 
 
 # In[63]:
 
 
 #Run preliminary catboost model
-catboost_mod_best_on = models.catboost_model(x_train, x_val, y_train, y_val, seed, use_best_mod=True, **params)
+catboost_mod = models.catboost_model(x_train, x_val, y_train, y_val, seed, use_best_mod=True, **params)
 
-
-# In[64]:
-
-
-#Run catboost model with use_best_mod = False
-catboost_mod_best_off = models.catboost_model(x_train, x_val, y_train, y_val, seed, use_best_mod=False, **params)
-
-
-# The recall score is higher for the CatBoost model with the use_best_mod set to False (0.857 vs. 0.844), so we will keep this setting turned off moving forward.
 
 # In[65]:
 
 
-del catboost_mod_best_on
-
-
-# In[66]:
-
-
 #Explore feature importances
-feature_importances = pd.DataFrame({'imp': catboost_mod_best_off.feature_importances_, 'col': x_train.columns})
+feature_importances = pd.DataFrame({'imp': catboost_mod.feature_importances_, 'col': x_train.columns})
 #Keep only top 10 most important features for model
 feature_importances = feature_importances.sort_values(['imp', 'col'], ascending=False).iloc[:10]
 print(feature_importances)
 
 
-# In[67]:
+# In[66]:
 
 
 #Keep top 10 most important features in x data sets to remove noise in the model
@@ -725,7 +752,7 @@ x_val_catboost_imp = x_val[feature_importances['col']]
 x_test_catboost_imp = x_test[feature_importances['col']]
 
 
-# In[68]:
+# In[67]:
 
 
 #Re-run catboost model with most important features only
@@ -733,14 +760,14 @@ catboost_mod = models.catboost_model(x_train_catboost_imp, x_val_catboost_imp,
                                      y_train, y_val, seed, use_best_mod=False, **params)
 
 
-# In[69]:
+# In[68]:
 
 
 #Predict y train and test sets using CatBoost model
 y_pred_train, y_pred_test = evaluation.predictions(catboost_mod, x_train_catboost_imp, x_test_catboost_imp)
 
 
-# In[70]:
+# In[69]:
 
 
 #Evaluate catboost model performance
@@ -749,9 +776,3 @@ print(catboost_results)
 
 
 # As seen above, the CatBoost model should be selected for this data set because the model has good recall and does not seem to be overfitting. Recall will capture the most positive instances and the cost of contacting customers who are identified as churners but actually were not (false positives) is low, so this is the metric of choice.
-
-# In[ ]:
-
-
-
-

@@ -6,6 +6,7 @@ Perform exploratory data analysis and develop Machine Learning models to predict
 * [Technologies](#technologies)
 * [Setup](#setup)
 * [Features](#features)
+* [Results](#results)
 * [Status](#status)
 * [Contact](#contact)
 * [Acknowledgements](#acknowledgements)
@@ -54,10 +55,8 @@ To-do list:
 
 * Grid search for Catboost
 
-## Status
-Project is: _in progress_
-
 ## Results
+Overall the CatBoost model outperformed the Random Forest and XGBoost models in recall. Recall is the chosen metric because the cost of false positives is low in this case and we want to capture all positives. The full metrics for each model is included below: 
 ### Random Forest Results:
 | Metric | Train | Test |
 | ------ | ----- | ----- |
@@ -78,14 +77,17 @@ Project is: _in progress_
 ### CatBoost Results:
 | Metric | Train | Test |
 | ------ | ----- | ----- |
-| AUC | 0.753 |  0.784 |
-| Accuracy | 0.736 | 0.762 |
-| F1 | 0.613 |  0.650 |
-| Recall | 0.789 | 0.830 |
-| Precision | 0.501 |  0.534 |
+| AUC | 0.753 |  0.753 |
+| Accuracy | 0.714 | 0.712 |
+| F1 | 0.608 |  0.608 |
+| Recall | 0.836 | 0.840 |
+| Precision | 0.478 |  0.476 |
+
+## Status
+Project is: _complete_
 
 ## Contact
-Created by [Gabrielle Nyirjesy](https://www.linkedin.com/in/gabrielle-gabby-nyirjesy) - feel free to contact me!
+Created by [Gabrielle Nyirjesy](https://www.linkedin.com/in/gabrielle-nyirjesy) - feel free to contact me!
 
 ## Acknowledgements
 * Data pulled from [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
