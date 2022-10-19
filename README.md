@@ -35,12 +35,12 @@ Then, the CatBoost, XGBoost, and Random Forest Models are created and improved t
 ## Setup
 Use requirements.txt file to install required packages, or install packages and versions listed below:
 
-* pandas==1.0.1
-* numpy==1.18.1
-* catboost==0.23
-* matplotlib==3.1.3
-* scikit_learn==0.23.1
-* xgboost==1.1.1
+* pandas==1.4.2
+* numpy==1.22.3
+* catboost==1.1
+* matplotlib==3.6.1
+* scikit_learn==1.0.2
+* xgboost==1.6.2
 
 Data can be found on [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
 
