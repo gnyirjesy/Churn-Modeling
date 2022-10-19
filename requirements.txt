@@ -16,7 +16,7 @@ ipykernel==6.16.0
 ipython==8.5.0
 ipywidgets==8.0.2
 jedi==0.18.1
-joblib==1.1.0
+joblib==1.2.0
 jupyter_client==7.4.2
 jupyter_core==4.11.2
 jupyterlab-widgets==3.0.3
